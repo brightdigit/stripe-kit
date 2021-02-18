@@ -15,6 +15,7 @@ public protocol SessionRoutes {
     ///   - cancelUrl: The URL the customer will be directed to if they decide to cancel payment and return to your website.
     ///   - paymentMethodTypes: A list of the types of payment methods (e.g., `card`) this Checkout session can accept. Read more about the supported payment methods and their requirements in our payment method details guide. If multiple payment methods are passed, Checkout will dynamically reorder them to prioritize the most relevant payment methods based on the customer’s location and other characteristics.
     ///   - successUrl: The URL the customer will be directed to after the payment or subscription creation is successful.
+    ///   - allowPromotionCodes: Enables user redeemable promotion codes.
     ///   - billingAddressCollection: Specify whether Checkout should collect the customer’s billing address. If set to `required`, Checkout will always collect the customer’s billing address. If left blank or set to `auto` Checkout will only collect the billing address when necessary.
     ///   - clientReferenceId: A unique string to reference the Checkout Session. This can be a customer ID, a cart ID, or similar, and can be used to reconcile the session with your internal systems.
     ///   - customer: ID of an existing customer paying for this session, if one exists. May only be used with line_items. Usage with subscription_data is not yet available. If blank, Checkout will create a new customer object based on information provided during the session. The email stored on the customer will be used to prefill the email field on the Checkout page. If the customer changes their email on the Checkout page, the Customer object will be updated with the new email.
@@ -32,6 +33,7 @@ public protocol SessionRoutes {
     func create(cancelUrl: String,
                 paymentMethodTypes: [StripeSessionPaymentMethodType],
                 successUrl: String,
+                allowPromotionCodes: Bool?,
                 billingAddressCollection: StripeSessionBillingAddressCollection?,
                 clientReferenceId: String?,
                 customer: String?,
@@ -73,6 +75,7 @@ extension SessionRoutes {
     public func create(cancelUrl: String,
                        paymentMethodTypes: [StripeSessionPaymentMethodType],
                        successUrl: String,
+                       allowPromotionCodes: Bool? = nil,
                        billingAddressCollection: StripeSessionBillingAddressCollection? = nil,
                        clientReferenceId: String? = nil,
                        customer: String? = nil,
@@ -89,6 +92,7 @@ extension SessionRoutes {
         return create(cancelUrl: cancelUrl,
                       paymentMethodTypes: paymentMethodTypes,
                       successUrl: successUrl,
+                      allowPromotionCodes: allowPromotionCodes,
                       billingAddressCollection: billingAddressCollection,
                       clientReferenceId: clientReferenceId,
                       customer: customer,
@@ -130,6 +134,7 @@ public struct StripeSessionRoutes: SessionRoutes {
     public func create(cancelUrl: String,
                        paymentMethodTypes: [StripeSessionPaymentMethodType],
                        successUrl: String,
+                       allowPromotionCodes: Bool?,
                        billingAddressCollection: StripeSessionBillingAddressCollection?,
                        clientReferenceId: String?,
                        customer: String?,
@@ -146,7 +151,11 @@ public struct StripeSessionRoutes: SessionRoutes {
         var body: [String: Any] = ["cancel_url": cancelUrl,
                                    "payment_method_types": paymentMethodTypes.map { $0.rawValue },
                                    "success_url": successUrl]
-        
+      
+        if let allowPromotionCodes = allowPromotionCodes {
+            body["allow_promotion_codes"] = allowPromotionCodes
+        }
+      
         if let billingAddressCollection = billingAddressCollection {
             body["billing_address_collection"] = billingAddressCollection.rawValue
         }

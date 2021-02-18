@@ -15,6 +15,8 @@ public struct StripeSession: StripeModel {
     public var amountSubtotal: Int?
     /// Total of all items after discounts and taxes are applied.
     public var amountTotal: Int?
+    /// Enables user redeemable promotion codes.
+    public var allowPromotionCodes: Bool?
     /// The value (`auto` or `required`) for whether Checkout collected the customer’s billing address.
     public var billingAddressCollection: StripeSessionBillingAddressCollection?
     /// The URL the customer will be directed to if they decide to cancel payment and return to your website.
